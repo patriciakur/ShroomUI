@@ -1,0 +1,20 @@
+import { NgModule }      from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent }  from './app.component';
+import { RobotInfoComponent } from './Settings/robot-info/robot-info.component';
+import { RobotComponent } from './Robot/robot.component';
+import { LoginComponent } from './login/login.component';
+import { NavigationControlsComponent } from './Robot/navigation-controls/navigation-controls.component';
+import { MapComponent } from './Robot/map/map.component';
+import { BigDogComponent } from './Robot/big-dog/big-dog.component';
+import { SettingsComponent } from './Settings/settings/settings.component';
+import { CommonModule } from '@angular/common';
+
+
+
+@NgModule({
+  imports:      [ BrowserModule, CommonModule , AppComponent, NavigationControlsComponent, MapComponent, BigDogComponent, SettingsComponent, RobotInfoComponent, RobotComponent, LoginComponent],
+  declarations: [  ],
+  bootstrap:    [ ]
+})
+export class AppModule { }

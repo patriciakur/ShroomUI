@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="shroomDesign.css" rel="stylesheet">
+    <title>BigDog UI</title>
+    <script src = "mapScripts.js"></script>
+    <script src = "joystickScripts.js"></script>
+    <script src="shroomScripts.js"></script>
+</head>
+<body onload="startUpFunctions()">
+    <h1>BigDog UI</h1>
+    <!-- Status Related -->
+    <!-- Display Current Battery% / If its charging -->
+    <div id ="batteryPercent" class="pie" style="--p:100"> 100% </div>
+    <!-- Display Emergency Button Status -->
+     <p>Emergency Button Status: <b id= "emergencyBtnStatus">PRESSED</b></p>
+
+
+    <!-- Display pathing status -->
+    
+    <!-- Nav by point -->
+    
+    <!-- Nav by coord -->
+    <input type="text" id="x" placeholder="X Coordinate">
+    <input type="text" id="y" placeholder="Y Coordinate">
+    <button onclick="navigationByCoordinate()">Navigate to Coordinate</button>
+
+    <!-- Navigation Related -->
+    <button onclick="navigateToCharge()">Navigate to Charging Port</button>
+    <button onclick="cancelNavigation()">Cancel Current Navigation</button>
+
+    <!-- Map -->
+    <section>
+        <img src= "map.png" alt="Map" style="width: 100%; height: auto;" id="imgID">
+    </section>
+    
+
+    <!-- Stick control to move? -->
+     <p style="text-align: center;">
+        X: <span id="x_coordinate"> </span>
+        Y: <span id="y_coordinate"> </span>
+        Speed: <span id="speed"> </span> %
+        Angle: <span id="angle"> </span>
+    </p>
+     <canvas id="joystickCanvas" style="z-index:2; float:right; border:1px solid #000000;"></canvas>
+
+</body>
+</html>

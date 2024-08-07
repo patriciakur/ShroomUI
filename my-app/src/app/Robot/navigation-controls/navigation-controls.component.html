@@ -1,0 +1,26 @@
+<mat-card appearance="raised" style="width: fit-content;">
+    <mat-card-header>
+      <mat-card-title>Navigation</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form>
+        <mat-form-field class="the-dense-zone" style="margin: 8px 8px 8px 0;" appearance="outline">
+          <mat-label>X Coordinate</mat-label>
+          <input matInput id="x" placeholder="X Coordinate">
+        </mat-form-field>
+        <mat-form-field class="the-dense-zone"style="margin: 8px 8px 8px 0;" appearance="outline">
+          <mat-label>Y Coordinate</mat-label>
+          <input matInput id="y" placeholder="Y Coordinate">
+        </mat-form-field>
+        <button mat-raised-button style="margin: 0px 8px 8px 0;"> Navigate to Coordinate</button>
+        <br>
+        <div style="text-align:center">
+            <button mat-raised-button style="margin: auto;"  (click)="navigateToCharge()"> Navigate to Charging Port</button>
+            &nbsp;&nbsp;&nbsp;
+            <button mat-raised-button style="margin: auto;"> Cancel Current Navigation</button>
+        </div>
+      </form>
+      
+    </mat-card-content>
+  
+  </mat-card>

@@ -1,0 +1,31 @@
+<mat-card style="width: fit-content; height: fit-content; margin: 50px;">
+    <mat-card-header>
+        <mat-card-title-group>
+            <mat-card-title>Robot Name</mat-card-title>
+            <span class="fill-remaining-space"></span>
+            <span><button mat-icon-button>+</button><button mat-icon-button (click)="deleteRobot()">X</button></span>
+          </mat-card-title-group>
+    </mat-card-header>
+    <mat-divider inset style="margin-left:0px; margin-top: 10px;"></mat-divider>
+    <mat-card-content class="cardData" style="text-align:center; margin-top: 25px;">
+        <form >
+            <p>
+                <mat-form-field floatLabel="always" style="margin-top: -10px;">
+                    <mat-label>Big Dog IP address</mat-label><input matInput>
+                </mat-form-field>
+            </p>
+            <p>
+                <mat-form-field floatLabel="always" style="margin-top: -10px;">
+                    <mat-label>Arm IP address</mat-label><input matInput>
+                </mat-form-field>
+            </p>
+            <p>
+                <mat-form-field floatLabel="always" style="margin-top: -10px;">
+                    <mat-label>Vertical IP address</mat-label><input matInput>
+                </mat-form-field>
+            </p>
+            <p style="margin-top: -10px; margin-left: -125px;"><label>Big Dog Map</label></p>
+            <p><input type="file" style="margin-left: 15px;"></p>
+        </form>
+    </mat-card-content>
+</mat-card>
