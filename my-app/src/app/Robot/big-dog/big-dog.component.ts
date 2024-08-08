@@ -22,13 +22,18 @@ export class BigDogComponent {
     chargeFlag: string = "";
     EmergencyBtnStatus: string = "";
     constructor(private bigDogService: BigDogService) { }
-
+    
     ngOnInit() {
-        this.bigDogService.getBigDogData('http://localhost:3000/submitToDB').subscribe((data) => {
-          const jsonData = JSON.parse(JSON.stringify(data));
-          this.battery = jsonData.rows[0].battery;
-          this.chargeFlag = jsonData.rows[0].chargeFlag==0 ? "Charging" : "Not Charging";
-          this.EmergencyBtnStatus = jsonData.rows[0].emergencyFlag==0 ? "PRESSED" : "Not Pressed";
-        });
+      this.updateBigDogData()
+    }
+
+    updateBigDogData(){
+      this.bigDogService.getBigDogData('http://localhost:3000/submitToDB').subscribe((data) => {
+        const jsonData = JSON.parse(JSON.stringify(data));
+        this.battery = jsonData.rows[0].battery;
+        this.chargeFlag = jsonData.rows[0].chargeFlag==0 ? "Charging" : "Not Charging";
+        this.EmergencyBtnStatus = jsonData.rows[0].emergencyFlag==0 ? "PRESSED" : "Not Pressed";
+      });
+      setTimeout(this.updateBigDogData, 5000)
     }
 }

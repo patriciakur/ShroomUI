@@ -11,7 +11,11 @@ const corsOptions = {
     origin: 'http://localhost:4200',
     optionsSuccessStatus: 200,
     methods: "GET, POST",
+    TargetOrigin: "http://localhost:4200",
+    credentials: true,
+    
 };
+
 
 app.use(cors(corsOptions)); //Enables Cross-Origin Resource Sharing, allowing resources to be requested from a different domain
 app.use(express.json()); // to support JSON-
@@ -53,16 +57,15 @@ app.get('/private', (req, res) => {
 })
 
 app.post('/users', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     try{
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
-        const user = JSON.stringify({name: req.body.name, password:hashedPassword, email:req.body.email})
+        let checkIfUserExists = await pool.query('SELECT EXISTS(SELECT 1 FROM users WHERE username=$1)', [req.body.name]);
 
-        let checkIfUserExists = false //await pool.query('SELECT EXISTS(SELECT 1 FROM users WHERE username=$1)', [req.body.name]);
-        
-        if (checkIfUserExists) { //.rows[0].exists
+        if (checkIfUserExists.rows[0].exists) {
             // reject the creation
-            console.log("User already exists")
+            res.status(500).send()
         }
         else{
             //create user
@@ -73,9 +76,13 @@ app.post('/users', async (req, res) => {
             let expiresAt = new Date(unixTime); //converts to date object
 
             //add session to db
-            await pool.query(`INSERT INTO sessions ("sessionToken", username, "expiryTime4") VALUES ($1, $2, $3) RETURNING *`, [sessionToken, req.body.name, expiresAt]);
-            
-            res.cookie('sessionToken', sessionToken, {maxAge: expiresAt})
+            await pool.query(`INSERT INTO sessions ("sessionToken", username, "expiryTime") VALUES ($1, $2, $3) RETURNING *`, [sessionToken, req.body.name, expiresAt]);
+            res.json(JSON.stringify({
+                sessionToken: sessionToken,
+                expiresAt: expiresAt
+            }));
+            console.log("User created")
+            res.status(201).send()
             
         }
     }
@@ -84,32 +91,37 @@ app.post('/users', async (req, res) => {
     }
 })
 app.post('/users/login', async (req, res) => {
-    const user = users.find(user => user.name === req.body.name)
+    const user = await pool.query('SELECT * FROM users WHERE email=$1', [req.body.email]);
     if (user == null) {
         return res.status(400).send('Cannot find user')
     }
     try {
-        if(await bcrypt.compare(req.body.password, user.password)){
-            res.send('Success')
+        if(await bcrypt.compare(req.body.password, user.rows[0].password)){
             //add cookie to db and return to user
             let sessionToken = uuid.v4();
             let unixTime= new Date().setFullYear(new Date().getFullYear() + 1); //makes expiration date 1 year from now
             let expiresAt = new Date(unixTime); //converts to date object
 
             //add session to db
-            await pool.query(`INSERT INTO sessions ("sessionToken", username, "expiryTime4") VALUES ($1, $2, $3) RETURNING *`, [sessionToken, req.body.name, expiresAt]);
-            
-            res.cookie('sessionToken', sessionToken, {maxAge: expiresAt})
+            await pool.query(`INSERT INTO sessions ("sessionToken", username, "expiryTime") VALUES ($1, $2, $3) RETURNING *`, [sessionToken, user.rows[0].username, expiresAt]);
+            console.log("enter3")
+            res.json(JSON.stringify({
+                sessionToken: sessionToken,
+                expiresAt: expiresAt
+            }));
+            res.status(201).send()
         } else {
             res.send('Not Allowed')
         }
     } catch {
+        console.log("enter4")
         res.status(500).send()
     }
 })
 
 // ShroomUI backend
-const submitToDBRouter = require( './Backend/routes/submitToDB' )
+const submitToDBRouter = require( './Backend/routes/submitToDB' );
+const { Target } = require('puppeteer');
 app.use("/submitToDB", submitToDBRouter);
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`))

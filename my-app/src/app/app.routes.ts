@@ -2,17 +2,17 @@ import { Routes } from '@angular/router';
 import { RobotComponent } from './Robot/robot.component';
 import { SettingsComponent } from './Settings/settings/settings.component';
 import { LoginComponent } from './login/login.component';
-import { AppComponent } from './app.component';
+import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: '/login', pathMatch: 'full'},
     {path: 'login', component: LoginComponent},
-    {path: '', component: AppComponent, 
+    {path: '', component: LayoutComponent, 
         children: [
             {path: 'robot', component: RobotComponent},
             {path: 'settings', component: SettingsComponent},
         ]
-},
+    },
 
     
     

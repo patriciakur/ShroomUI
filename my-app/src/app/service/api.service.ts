@@ -12,9 +12,9 @@ export class ApiService {
     
   }
   get<JSON> (requestPath: string):Observable<JSON>{
-    return this.httpClient.get<JSON>(requestPath);
+    return this.httpClient.get<JSON>(requestPath, { withCredentials: true });
   }
   post<JSON>(requestPath: string, data: JSON):Observable<any>{
-    return this.httpClient.post<JSON>(requestPath, data);
+    return this.httpClient.post<JSON>(requestPath, data, { withCredentials: true });
   }
 }

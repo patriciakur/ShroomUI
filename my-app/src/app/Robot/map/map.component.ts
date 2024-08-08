@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { map } from 'rxjs';
+
 
 @Component({
   selector: 'app-map',
@@ -9,5 +11,8 @@ import { MatCardModule } from '@angular/material/card';
   imports: [MatCardModule],
 })
 export class MapComponent {
-
+  imgName= "/my-app/public/example.png"
+  ngonInit() {
+    // This function will be called when the component is loaded
+  }
 }

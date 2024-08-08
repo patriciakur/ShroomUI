@@ -1,21 +1,2 @@
-<mat-toolbar>
-    <mat-toolbar-row>
-        <button mat-icon-button aria-label="Menu icon" class="burger" (click)="drawer.toggle()">
-            &#8801;
-        </button>
-        <span  style="font-weight: bold; font-size:25px;">Robot 1</span>
-    </mat-toolbar-row>
-</mat-toolbar>
-
-<mat-drawer-container>
-    <mat-drawer #drawer class="drawer" mode="side" opened="true" autosize>
-        <mat-nav-list>
-            <a mat-list-item routerLink="robot">Robot 1</a>
-            <a mat-list-item routerLink="settings">Settings</a>
-        </mat-nav-list>
-    </mat-drawer>
-    <mat-drawer-content>
-        <router-outlet></router-outlet>
-    </mat-drawer-content>
-</mat-drawer-container>
+<router-outlet></router-outlet>
   

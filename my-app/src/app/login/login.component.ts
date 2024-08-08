@@ -23,9 +23,9 @@ export class LoginComponent {
     let signUpDataText = '{"name": "' + this.signUpObj.name + '", "email": "' + this.signUpObj.email + '", "password": "' + this.signUpObj.password + '"}';
     let signUpData = JSON.parse(signUpDataText);
     this.LoginService.signUp('http://localhost:3000/users', signUpData).subscribe((data) => {
-      if(data.status == 200){
-        alert('Registration Successful');
-        this.router.navigateByUrl('/');
+      if(data){
+        sessionStorage.setItem('key', data["sessionToken"]);
+        this.router.navigateByUrl('/settings');
       }
       else{
         alert('Registration Failed');
@@ -33,16 +33,19 @@ export class LoginComponent {
     });
   }
 
-  /*onLogin(){
+  onLogin(){
+    let loginDataText = '{"email": "' + this.loginObj.email + '", "password": "' + this.loginObj.password + '"}';
+    let loginData = JSON.parse(loginDataText);
     this.LoginService.login('http://localhost:3000/users/login', loginData).subscribe((data) => {
-      if(data.status == 200){
-        alert('Login Successful');
+      if(data){
+        sessionStorage.setItem('key', data["sessionToken"]);
+        this.router.navigateByUrl('/settings');
       }
       else{
-        alert('Login Failed');
+        alert('Incorrect Username or Password');
       }
     });
-  }*/
+  }
 }
 
 
@@ -59,11 +62,9 @@ export class signUpModule{
 }
 
 export class loginModule{
-  name: string;
   email: string;
   password: string;
   constructor(){
-    this.name =  "";
     this.email = "";
     this.password = "";
   }

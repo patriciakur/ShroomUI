@@ -7,8 +7,8 @@ import { ApiService } from './api.service';
 export class LoginService {
   constructor(private apiService: ApiService) {  }
 
-  getLogins(requestPath: string){
-    return this.apiService.get(requestPath);
+  login(requestPath: string, data: JSON){
+    return this.apiService.post(requestPath, data);
   }
 
   signUp(requestPath: string, data: JSON){

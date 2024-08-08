@@ -6,7 +6,6 @@ import threading
 from datetime import datetime
 
 # Defining database connection parameters
-robotIP = "172.27.34.74"
 host = "shallowly-forbearing-bandicoot.data-1.use1.tembo.io"
 port = 5432
 database = "Mushroom"
@@ -38,14 +37,14 @@ def getStatus(url, method, body): # Function to get status from the web API
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
-def recursiveGetStatus(url, method, body, delay):
+def recursiveGetStatus(url, method, body, delay, robotIP):
     while True:
         data = getStatus(url, method, body)
         if data:
             # Try to add data to database
             cursor = conn.cursor()
             try:
-                cursor.execute('INSERT INTO statuses (battery, "chargeFlag", "emergencyButton", "timeOfResponse") VALUES (%s, %s, %s, %s)', (data["battery"], data["chargeFlag"], data["emergencyButton"], datetime.now()))
+                cursor.execute('INSERT INTO statuses (battery, "chargeFlag", "emergencyButton", "timeOfResponse", "robotIP") VALUES (%s, %s, %s, %s, %s)', (data["battery"], data["chargeFlag"], data["emergencyButton"], datetime.now(), robotIP))
                 conn.commit()
                 print("Components added to the database!")
             except psycopg2.Error as e:
@@ -101,10 +100,10 @@ def executeRequest(requestPath, requestBody, needStatusCheck, cursor):
         print(f"An error occurred: {e}")
         return None
         
-def checkForRequests():
+def checkForRequests(robotIP):
     try:
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM requests WHERE "requestResponse" IS NULL')
+        cursor.execute('SELECT * FROM requests WHERE "robotIP"= %s AND "requestResponse" IS NULL', (robotIP))
         requests = cursor.fetchall()
         for request in requests:
             executeRequest(request[0], request[1],request[4],cursor)      
@@ -114,31 +113,20 @@ def checkForRequests():
     finally:
         cursor.close()
   
-def recursiveCheckForRequests():
+def recursiveCheckForRequests(robotIP):
     while True:
         checkForRequests()
-        time.sleep(20)
+        time.sleep(2)
 
 # Connect to the database
+robotIP = input("Enter IP address of the Reeman Big Dog Robot:")
 conn = connectToDatabase(host, port, database, user, password)
 if conn:
-    '''t1 = threading.Thread(target=recursiveGetStatus, args=("http://" + robotIP + "/reeman/base_encode", "GET", None, 60)) # thread to constantly get statuses
-    t2 = threading.Thread(target =recursiveCheckForRequests, args = ())    # thread to constantly check for new requests
+    t1 = threading.Thread(target=recursiveGetStatus, args=("http://" + robotIP + "/reeman/base_encode", "GET", None, 5, robotIP)) # thread to constantly get statuses
+    t2 = threading.Thread(target=recursiveCheckForRequests, args = (robotIP))    # thread to constantly check for new requests
  
     t1.start()
-    t2.start()'''
-    
-    #recursiveCheckForRequests()
-    cursor = conn.cursor()
-    try:
-        obj = [{"try" : "ing"}]
-        cursor.execute('INSERT INTO requests ("requestPath", "requestBody", "requestStatusCheck") VALUES (%s, %s, %s)', ("pathname", json.dumps(obj), True))
-        conn.commit()
-        print("Components added to the database!")
-    except psycopg2.Error as e:
-        print(f"Unable to insert components into the database: {e}")
-    finally:
-        cursor.close()
+    t2.start()
     
     conn.close()
     
