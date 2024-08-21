@@ -9,7 +9,8 @@ export const routes: Routes = [
     {path: 'login', component: LoginComponent},
     {path: '', component: LayoutComponent, 
         children: [
-            {path: 'robot', component: RobotComponent},
+            {path: 'robot/:id', component: RobotComponent
+            },
             {path: 'settings', component: SettingsComponent},
         ]
     },

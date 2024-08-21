@@ -6,7 +6,7 @@
         </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="3" [rowspan]="1">
-        <app-navigation-controls></app-navigation-controls>
+        <app-navigation-controls [Coordinates]="coordinates"></app-navigation-controls>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1">
         <app-current-battery [battery] = "battery" [chargeFlag] = "chargeFlag"></app-current-battery>
@@ -14,11 +14,14 @@
     <mat-grid-tile [colspan]="1" [rowspan]="1">
         <mat-card>
             <mat-card-header><mat-card-title>Statuses</mat-card-title></mat-card-header>
-            <mat-card-content> Emergency Button Status: {{EmergencyBtnStatus}}</mat-card-content>
+            <mat-card-content> 
+                Big Dog IP: {{bigDogIP}} <br>
+                Emergency Button Status: {{EmergencyBtnStatus}}
+            </mat-card-content>
         </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="3" [rowspan]="2">
-        <app-map></app-map>
+        <app-map (onSelect)="getCoordinates($event)"></app-map>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1">
         <mat-card>

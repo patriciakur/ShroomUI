@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
     let { requestPath, data, needsStatusCheck } = req.body;
     let newPath = "http://" + ip + requestPath;
     try {
-        let infoToSubmit = await pool.query(`INSERT INTO requests ("requestPath", "requestBody", "requestStatusCheck") VALUES ($1,  $2, $3) RETURNING *`, [newPath, data , needsStatusCheck]);
+        await pool.query(`INSERT INTO requests ("requestPath", "requestBody", "requestStatusCheck", "robotIP") VALUES ($1,  $2, $3, $4) RETURNING *`, [newPath, data , needsStatusCheck, ip]);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

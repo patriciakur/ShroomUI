@@ -10,7 +10,9 @@
 <mat-drawer-container>
     <mat-drawer #drawer class="drawer" mode="side" opened="true" autosize>
         <mat-nav-list>
-            <a mat-list-item routerLink="robot">Robot 1</a>
+            <div *ngFor="let robots of robotList">
+                <a mat-list-item [routerLink]="['/robot', robots.robotID]">{{robots.robotName}}</a>
+            </div>
             <a mat-list-item routerLink="settings">Settings</a>
         </mat-nav-list>
     </mat-drawer>

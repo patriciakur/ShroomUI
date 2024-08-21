@@ -6,6 +6,7 @@ import threading
 from datetime import datetime
 
 # Defining database connection parameters
+#robotIP = "172.27.34.74"
 host = "shallowly-forbearing-bandicoot.data-1.use1.tembo.io"
 port = 5432
 database = "Mushroom"
@@ -92,8 +93,8 @@ def executeRequest(requestPath, requestBody, needStatusCheck, cursor):
                     print("Request status updated!")
                 except psycopg2.Error as e:
                     print(f"Unable to update request status: {e}")
-                finally:
-                    cursor.close()
+                #finally:
+                    #cursor.close()
         else:
             print(f"Failed to make GET request. Status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -103,7 +104,7 @@ def executeRequest(requestPath, requestBody, needStatusCheck, cursor):
 def checkForRequests(robotIP):
     try:
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM requests WHERE "robotIP"= %s AND "requestResponse" IS NULL', (robotIP))
+        cursor.execute('SELECT * FROM requests WHERE "robotIP"= %s AND "requestResponse" IS NULL', (robotIP,)) 
         requests = cursor.fetchall()
         for request in requests:
             executeRequest(request[0], request[1],request[4],cursor)      
@@ -115,20 +116,21 @@ def checkForRequests(robotIP):
   
 def recursiveCheckForRequests(robotIP):
     while True:
-        checkForRequests()
-        time.sleep(2)
+        checkForRequests(robotIP)
+        time.sleep(20)
 
 # Connect to the database
 robotIP = input("Enter IP address of the Reeman Big Dog Robot:")
 conn = connectToDatabase(host, port, database, user, password)
 if conn:
-    t1 = threading.Thread(target=recursiveGetStatus, args=("http://" + robotIP + "/reeman/base_encode", "GET", None, 5, robotIP)) # thread to constantly get statuses
-    t2 = threading.Thread(target=recursiveCheckForRequests, args = (robotIP))    # thread to constantly check for new requests
- 
-    t1.start()
+    #t1 = threading.Thread(target=recursiveGetStatus, args=("http://" + robotIP + "/reeman/base_encode", "GET", None, 5, robotIP)) # thread to constantly get statuses
+    t2 = threading.Thread(target=recursiveCheckForRequests, args = (robotIP,))    # thread to constantly check for new requests
+    
+    
+    #t1.start()
     t2.start()
     
-    conn.close()
+    #conn.close()
     
     
 # Assumes that user will use ctrl c to stop the program, else need to add a way to stop the threads and conn.close() 

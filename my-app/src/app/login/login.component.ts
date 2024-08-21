@@ -24,8 +24,8 @@ export class LoginComponent {
     let signUpData = JSON.parse(signUpDataText);
     this.LoginService.signUp('http://localhost:3000/users', signUpData).subscribe((data) => {
       if(data){
-        sessionStorage.setItem('key', data["sessionToken"]);
-        this.router.navigateByUrl('/settings');
+        const userData = JSON.parse(data);
+        sessionStorage.setItem('key', userData.id);
       }
       else{
         alert('Registration Failed');
@@ -34,11 +34,12 @@ export class LoginComponent {
   }
 
   onLogin(){
-    let loginDataText = '{"email": "' + this.loginObj.email + '", "password": "' + this.loginObj.password + '"}';
+    let loginDataText = '{"username": "' + this.loginObj.user + '", "password": "' + this.loginObj.password + '"}';
     let loginData = JSON.parse(loginDataText);
     this.LoginService.login('http://localhost:3000/users/login', loginData).subscribe((data) => {
       if(data){
-        sessionStorage.setItem('key', data["sessionToken"]);
+        const userData = JSON.parse(data);
+        sessionStorage.setItem('key', userData.id);
         this.router.navigateByUrl('/settings');
       }
       else{
@@ -62,10 +63,10 @@ export class signUpModule{
 }
 
 export class loginModule{
-  email: string;
+  user: string;
   password: string;
   constructor(){
-    this.email = "";
+    this.user = "";
     this.password = "";
   }
 }

@@ -6,13 +6,13 @@
       <form>
         <mat-form-field class="the-dense-zone" style="margin: 8px 8px 8px 0;" appearance="outline">
           <mat-label>X Coordinate</mat-label>
-          <input matInput id="x" placeholder="X Coordinate">
+          <input matInput id="x" placeholder="X Coordinate" [value]="xCoord">
         </mat-form-field>
         <mat-form-field class="the-dense-zone"style="margin: 8px 8px 8px 0;" appearance="outline">
           <mat-label>Y Coordinate</mat-label>
-          <input matInput id="y" placeholder="Y Coordinate">
+          <input matInput id="y" placeholder="Y Coordinate" [value]="yCoord">
         </mat-form-field>
-        <button mat-raised-button style="margin: 0px 8px 8px 0;"> Navigate to Coordinate</button>
+        <button mat-raised-button style="margin: 0px 8px 8px 0;" (click)="navigateToCoordinates()"> Navigate to Coordinate</button>
         <br>
         <div style="text-align:center">
             <button mat-raised-button style="margin: auto;"  (click)="navigateToCharge()"> Navigate to Charging Port</button>

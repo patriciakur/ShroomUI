@@ -15,6 +15,13 @@ export class ApiService {
     return this.httpClient.get<JSON>(requestPath, { withCredentials: true });
   }
   post<JSON>(requestPath: string, data: JSON):Observable<any>{
-    return this.httpClient.post<JSON>(requestPath, data, { withCredentials: true });
+    return this.httpClient.post<JSON>(requestPath, data);
+  }
+  put<JSON>(requestPath: string, data: JSON):Observable<any>{
+    return this.httpClient.put<JSON>(requestPath, data);
+  }
+  delete<JSON>(requestPath: string):Observable<any>{
+    console.log('Deleting:', requestPath);
+    return this.httpClient.delete<JSON>(requestPath);
   }
 }
