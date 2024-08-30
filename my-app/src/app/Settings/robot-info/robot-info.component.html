@@ -10,12 +10,12 @@
                 <span class="fill-remaining-space"></span>
                 <span>
                     <ng-container *ngIf="readonly">
-                        <button mat-icon-button type="button" (click)="updateData()"><fa-icon [icon]="['fas', 'edit']"></fa-icon></button>
+                        <button mat-mini-fab type="button" (click)="updateData()"><fa-icon [icon]="['fas', 'edit']"></fa-icon></button>
                     </ng-container>
                     <ng-container *ngIf="!readonly">
-                        <button mat-icon-button type="button" (click)="updateData()"><fa-icon [icon]="['fas', 'floppy-disk']"></fa-icon></button>
+                        <button mat-mini-fab type="button" (click)="updateData()"><fa-icon [icon]="['fas', 'floppy-disk']"></fa-icon></button>
                     </ng-container>
-                    <button mat-icon-button (click)="deleteRobot()"type="button"><fa-icon [icon]="['fas', 'trash']"></fa-icon></button>
+                    <button mat-mini-fab (click)="deleteRobot()"type="button"><fa-icon [icon]="['fas', 'trash']"></fa-icon></button>
                 </span>
             </mat-card-title-group>
         </mat-card-header>
@@ -32,7 +32,10 @@
                 </mat-form-field>
             </p>
             <p style="margin-top: -10px; margin-left: -125px;"><label>Big Dog Map</label></p>
-            <p><input type="file" style="margin-left: 15px;" [(ngModel)]="imageFile" name="imageInput" id="fileInput" (change)="onFileSelected($event)"></p>
+            <ng-container *ngIf="imageFile">
+                <p>A Map for this robot exists.</p>
+            </ng-container>
+            <p><input type="file" accept="image/*" style="margin-left: 15px;" [(ngModel)]="imageFile" name="imageInput" id="fileInput" (change)="onFileSelected($event)"></p>
         </mat-card-content>
     </form>
 </mat-card>

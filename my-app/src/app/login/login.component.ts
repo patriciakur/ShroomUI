@@ -40,6 +40,7 @@ export class LoginComponent {
       if(data){
         const userData = JSON.parse(data);
         sessionStorage.setItem('key', userData.id);
+        this.LoginService.loggedIn();
         this.router.navigateByUrl('/settings');
       }
       else{

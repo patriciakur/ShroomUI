@@ -21,7 +21,7 @@
         </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="3" [rowspan]="2">
-        <app-map (onSelect)="getCoordinates($event)"></app-map>
+        <app-map [imgData]="imgData" (onSelect)="getCoordinates($event)"></app-map>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1">
         <mat-card>

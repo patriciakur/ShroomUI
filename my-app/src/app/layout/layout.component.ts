@@ -20,40 +20,15 @@ import { ActivatedRoute } from '@angular/router';
 export class LayoutComponent {
   userID: string | null = "";
   robotList: any[] = [];
+  topBarTitle: string = "Settings";
+
   constructor(private router: Router, private SettingService: SettingsService, private route: ActivatedRoute) { 
     this.SettingService.getRobotChange().subscribe(() => {
-      this.robotList = [];
-      this.updateRobotList();
+      this.robotList = this.SettingService.getRobotList();
     });
   }
-
-  ngOnInit() {
-    this.updateRobotList();
-  }
-
-
-  updateRobotList(){
-    this.userID = sessionStorage.getItem('key');
-    if (this.userID == "" || this.userID == null) {
-      alert('Please log in');
-      this.router.navigateByUrl('/login');
-      return;
-    }
-    else{
-      this.SettingService.getRobots(this.userID).subscribe((data) => {
-        if(data){
-          //get list of robots from db and create components with each robot's info
-          let jsonData = JSON.parse(JSON.stringify(data));
-          for(let robot of jsonData.rows) {
-            this.robotList.push(robot);
-          }
-        }
-        else{
-          alert('Failed to get robots');
-        }
-      });
-    }
-  }
   
-
+  navigate(navName: string){
+    this.topBarTitle = navName;
+  }
 }

@@ -29,74 +29,47 @@ def connectToDatabase(host, port, database, user, password):
         return None
     
 # Defining function to get status from the web API and add to database
-def getStatus(url, method, body): # Function to get status from the web API
+def getStatus(robotIP): # Function to get status from the web API
     try:
-        response = requests.request(method, url, json=body)
-        response.raise_for_status()  # Raise an exception if the request was unsuccessful
-        data = response.json()  # Convert the response to JSON
+        response = requests.get("http://" + robotIP + "/reeman/base_encode", json=None) 
+        response.raise_for_status() 
+        response2 = requests.get("http://" + robotIP + "/reeman/pose", json=None)
+        response2.raise_for_status()
+        data= dict(response.json(), **response2.json())
         return data
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
-def recursiveGetStatus(url, method, body, delay, robotIP):
+def recursiveGetStatus(robotIP):
     while True:
-        data = getStatus(url, method, body)
+        data = getStatus(robotIP)
         if data:
             # Try to add data to database
             cursor = conn.cursor()
             try:
-                cursor.execute('INSERT INTO statuses (battery, "chargeFlag", "emergencyButton", "timeOfResponse", "robotIP") VALUES (%s, %s, %s, %s, %s)', (data["battery"], data["chargeFlag"], data["emergencyButton"], datetime.now(), robotIP))
+                cursor.execute('INSERT INTO statuses (battery, "chargeFlag", "emergencyButton", "timeOfResponse", "robotIP","xCoord", "yCoord", theta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (data["battery"], data["chargeFlag"], data["emergencyButton"], datetime.now(), robotIP, data["x"], data["y"], data["theta"]))
                 conn.commit()
-                print("Components added to the database!")
             except psycopg2.Error as e:
-                print(f"Unable to insert components into the database: {e}")
+                print(f"Unable to insert status into the database: {e}")
             finally:
                 cursor.close()
-                time.sleep(delay)
+                time.sleep(5)
                 
 # Defining function to get requests from DB and send to web API
-def executeRequest(requestPath, requestBody, needStatusCheck, cursor):
+def executeRequest(requestPath, requestBody, requestID):
     try:
-        response = requests.get(requestPath, json=requestBody)
+        response = requests.post(requestPath, json=requestBody)
         if response.status_code == 200:
-            # if the request is a nav request (needs a navigation status check), get status of navigation until it is either 3 (success) or 4 (failed)
-            isDecided = False
-            if needStatusCheck:
-                while isDecided == False:
-                    try:
-                        response = requests.get("http://" + robotIP + "/reeman/movebase_status")
-                        if response["status"] == 3 or response["status"] == 4:
-                            isDecided = True
-                            if response["status"] == 3:
-                                response["status"] = "Success"
-                            else:
-                                response["status"] = "Failed"
-                            #cursor = conn.cursor()
-                            try:
-                                cursor.execute('UPDATE requests SET "requestResponse" = %s WHERE "requestPath" = %s', (response.json(), requestPath))
-                                conn.commit()
-                                print("Request status updated!")
-                            except psycopg2.Error as e:
-                                print(f"Unable to update request status: {e}")
-                            #finally:
-                                #cursor.close()
-                        else:
-                            time.sleep(30) # check if the navigation has completed every 30 seconds
-                    except requests.exceptions.RequestException as e:
-                        print(f"An error occurred: {e}")
-                        return None
-            else: 
-                #cursor = conn.cursor()
-                try:
-                    cursor.execute('UPDATE requests SET "requestResponse" = %s WHERE "requestPath" = %s', (response.json(), requestPath))
-                    conn.commit()
-                    print("Request status updated!")
-                except psycopg2.Error as e:
-                    print(f"Unable to update request status: {e}")
-                #finally:
-                    #cursor.close()
+            try:
+                cursor = conn.cursor()
+                print(response.json())
+                cursor.execute('UPDATE requests SET "requestResponse" = %s WHERE "requestRequestID" = %s', (json.dumps(response.json()), requestID))
+                conn.commit()
+                cursor.close()
+            except psycopg2.Error as e:
+                print(f"Unable to update request status: {e}")
         else:
-            print(f"Failed to make GET request. Status code: {response.status_code}")
+            print(f"Failed to make POST request. Status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
@@ -106,28 +79,27 @@ def checkForRequests(robotIP):
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM requests WHERE "robotIP"= %s AND "requestResponse" IS NULL', (robotIP,)) 
         requests = cursor.fetchall()
+        cursor.close()
         for request in requests:
-            executeRequest(request[0], request[1],request[4],cursor)      
+            executeRequest(request[0], request[1],request[3])      # 0 = path, 1 = body, 3 = requestID
     except psycopg2.Error as e:
         print(f"Unable to fetch requests from the database: {e}")
         return None
-    finally:
-        cursor.close()
   
 def recursiveCheckForRequests(robotIP):
     while True:
         checkForRequests(robotIP)
-        time.sleep(20)
+        time.sleep(2)
 
 # Connect to the database
 robotIP = input("Enter IP address of the Reeman Big Dog Robot:")
 conn = connectToDatabase(host, port, database, user, password)
 if conn:
-    #t1 = threading.Thread(target=recursiveGetStatus, args=("http://" + robotIP + "/reeman/base_encode", "GET", None, 5, robotIP)) # thread to constantly get statuses
-    t2 = threading.Thread(target=recursiveCheckForRequests, args = (robotIP,))    # thread to constantly check for new requests
+    t1 = threading.Thread(target=recursiveGetStatus, args=(robotIP,)) # thread to constantly get statuses
+    t2 = threading.Thread(target=recursiveCheckForRequests, args = (robotIP,)) # thread to constantly check for new requests
     
     
-    #t1.start()
+    t1.start()
     t2.start()
     
     #conn.close()

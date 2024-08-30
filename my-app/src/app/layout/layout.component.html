@@ -3,17 +3,17 @@
         <button mat-icon-button aria-label="Menu icon" class="burger" (click)="drawer.toggle()">
             &#8801;
         </button>
-        <span  style="font-weight: bold; font-size:25px;">Robot 1</span>
+        <span  style="font-weight: bold; font-size:25px;">{{topBarTitle}}</span>
     </mat-toolbar-row>
 </mat-toolbar>
 
 <mat-drawer-container>
-    <mat-drawer #drawer class="drawer" mode="side" opened="true" autosize>
+    <mat-drawer #drawer class="drawer" mode="side" autosize>
         <mat-nav-list>
             <div *ngFor="let robots of robotList">
-                <a mat-list-item [routerLink]="['/robot', robots.robotID]">{{robots.robotName}}</a>
+                <a mat-list-item [routerLink]="['/robot', robots.robotID]" (click)="navigate(robots.robotName)">{{robots.robotName}}</a>
             </div>
-            <a mat-list-item routerLink="settings">Settings</a>
+            <a mat-list-item routerLink="settings" (click)="navigate('Settings')">Settings</a>
         </mat-nav-list>
     </mat-drawer>
     <mat-drawer-content>

@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Output } from '@angular/core';
 import { ApiService } from './api.service';
+import { EventEmitter } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -14,4 +15,13 @@ export class LoginService {
   signUp(requestPath: string, data: JSON){
     return this.apiService.post(requestPath, data);
   }
+
+  @Output() loginChange = new EventEmitter<void>();
+  getLoginStatus(){
+    return this.loginChange;
+  }
+  loggedIn(){
+    this.loginChange.emit();
+  }
+
 }

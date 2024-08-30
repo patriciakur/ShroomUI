@@ -21,7 +21,6 @@ export class ApiService {
     return this.httpClient.put<JSON>(requestPath, data);
   }
   delete<JSON>(requestPath: string):Observable<any>{
-    console.log('Deleting:', requestPath);
     return this.httpClient.delete<JSON>(requestPath);
   }
 }

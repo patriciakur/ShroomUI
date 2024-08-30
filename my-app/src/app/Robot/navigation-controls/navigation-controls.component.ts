@@ -45,49 +45,36 @@ export class NavigationControlsComponent {
       this.route.paramMap.subscribe(params => {
         this.robotID = params.get('id')!;
         this.ip = "";
-        this.SettingService.getRobots(this.userID!).subscribe((data) => {
-          if(data){
-            //get list of robots from db and create components with each robot's info
-            let jsonData = JSON.parse(JSON.stringify(data));
-            for(let robot of jsonData.rows) {
-              if (robot.robotID == this.robotID) {
-                this.ip = robot.bigDogIP;
-                if(this.ip == null || this.ip == "") {
-                  //alert('Please set the Big Dog IP in the settings');
-                  this.router.navigateByUrl('/settings');
-                  return;
-                }
-              }
-            }
-          }
-          else{
-            alert('Failed to get robots');
-          }
-        });
+        let robot = this.SettingService.getRobotinList(Number(this.robotID))
+        this.ip= robot.bigDogIP;
+        if(this.ip == null || this.ip == "") {
+          //alert('Please set the Big Dog IP in the settings');
+          this.router.navigateByUrl('/settings');
+          return;
+        }
       })
     } 
   }
   
 
-  submitToDB(requestPath: string, data: JSON, needsStatusCheck: boolean) {
-    this.body = JSON.parse(JSON.stringify({requestPath, data, needsStatusCheck, ip: this.ip}));
+  submitToDB(requestPath: string, data: JSON) {
+    this.body = JSON.parse(JSON.stringify({requestPath, data, ip: this.ip}));
     this.bigDogService.postBigDogData('http://localhost:3000/submitToDB', this.body).subscribe((res) => {
     })
   }
   navigateToCharge() {
     this.requestPath = "/cmd/charge";
-    this.data = { "type": "1", "point" : "charging_pile"};
+    this.data = { "type": 0, "point" : "charging_pile"};
     this.needsStatusCheck = true;
-    this.submitToDB(this.requestPath, this.data, this.needsStatusCheck);
+    this.submitToDB(this.requestPath, this.data);
   }
   navigateToCoordinates() {
     this.theta = Math.atan2(this.yCoord, this.xCoord); 
 
     this.requestPath = "/cmd/nav";
     this.data = { "x": this.xCoord, "y": this.yCoord, "theta": this.theta};
-    this.needsStatusCheck = true;
 
-    this.submitToDB(this.requestPath, this.data, this.needsStatusCheck);
+    this.submitToDB(this.requestPath, this.data);
   }
 
   ngOnChanges(changes: SimpleChanges) {

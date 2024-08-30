@@ -25,7 +25,16 @@ export class RobotComponent {
   @Input() id: string = "";
   displayBigDog: boolean = true;
   constructor(private SettingService: SettingsService, private router:Router) { 
-
+    this.SettingService.getRobotChange().subscribe(() => {
+      if (this.id) {
+        this.robotID = +this.id;
+      }
+      this.SettingService.getRobotinList(this.robotID).subscribe((data : any) => {
+        this.robotName = data.robotName;
+        this.bigDogIP = data.bigDogIP;
+        this.armIP = data.armIP;
+      })
+    })
   }
 
   ngOnInit(){
@@ -34,27 +43,6 @@ export class RobotComponent {
       alert('Please log in');
       this.router.navigateByUrl('/login');
       return;
-    }
-    else{
-      if (this.id) {
-        this.robotID = +this.id;
-      }
-      this.SettingService.getRobots(this.userID).subscribe((data) => {
-        if(data){
-          //get list of robots from db and create components with each robot's info
-          let jsonData = JSON.parse(JSON.stringify(data));
-          for(let robot of jsonData.rows) {
-            if (robot.robotID == this.robotID) {
-              this.robotName = robot.robotName;
-              this.bigDogIP = robot.bigDogIP;
-              this.armIP = robot.armIP;
-            }
-          }
-        }
-        else{
-          alert('Failed to get robots');
-        }
-      });
     }
   }
 

@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "concurrently \"ng serve\" \"npm run dev\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dev": "node Server/server.js"
   },
   "private": true,
   "dependencies": {
@@ -23,7 +24,10 @@
     "@fortawesome/angular-fontawesome": "^0.15.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "bcrypt": "^5.1.1",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
+    "pg": "^8.12.0",
     "rxjs": "~7.8.0",
     "sass": "^1.77.8",
     "tslib": "^2.3.0",

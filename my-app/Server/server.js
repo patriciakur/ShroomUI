@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const port = 3000;
-const pool = require('./Backend/routes/creds');
+const pool = require('./creds');
 const bcrypt = require('bcrypt');
 
 const corsOptions = {
@@ -14,17 +14,18 @@ const corsOptions = {
     
 };
 
-
 app.use(cors(corsOptions)); //Enables Cross-Origin Resource Sharing, allowing resources to be requested from a different domain
-app.use(express.json()); // to support JSON-
+app.use(express.json({limit: '50mb'})); // to support JSON-
 app.use(express.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded
 
 //configures Express middleware to serve static files (such as HTML, CSS, images, etc.) from a directory named public
+app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/Backend/public')); 
+
 
 // Start at shroomUI.html
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/Backend/public/shroomUI.html");
+    res.sendFile(__dirname + "/Backend/shroomUI.html");
 })
 
 
@@ -79,10 +80,10 @@ app.post('/users/login', async (req, res) => {
 //const ip = "172.27.34.74";
 
 app.post('/submitToDB', async (req, res) => {
-    let { requestPath, data, needsStatusCheck, ip } = req.body;
+    let { requestPath, data, ip } = req.body;
     let newPath = "http://" + ip + requestPath;
     try {
-        await pool.query(`INSERT INTO requests ("requestPath", "requestBody", "requestStatusCheck", "robotIP") VALUES ($1,  $2, $3, $4) RETURNING *`, [newPath, data , needsStatusCheck, ip]);
+        await pool.query(`INSERT INTO requests ("requestPath", "requestBody", "robotIP") VALUES ($1,  $2, $3) RETURNING *`, [newPath, data, ip]);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -106,7 +107,6 @@ app.get('/robotList/:userID', async (req, res) => {
 });
 
 app.post('/addRobot', async (req, res) => {
-    console.log(req.body)
     req.body.robotName = req.body.robotName === '' ? null : req.body.robotName;
     req.body.bigDogIP = req.body.bigDogIP === '' ? null : bigDogIP;
     req.body.armIP= req.body.armIP === '' ? null : armIP;
@@ -114,7 +114,6 @@ app.post('/addRobot', async (req, res) => {
         await pool.query(`INSERT INTO robots ("robotID", "robotName", "bigDogIP", "armIP", "userID") VALUES ($1, $2, $3, $4, $5) RETURNING *`, [req.body.robotID, req.body.robotName, req.body.bigDogIP, req.body.armIP , parseInt(req.body.userID)]);
         
         res.json(req.body);
-        res.status(201).send()
     }
     catch {
         res.status(500).send()
@@ -141,9 +140,9 @@ app.put('/updateRobot', async (req, res) => {
     }
 });
 
-app.put('/changeUsername', async (req, res) => {
+app.put('/updateProfile', async (req, res) => {
     try {
-        await pool.query(`UPDATE users SET "username" = $1 WHERE "userID" = $2`, [req.body.newUsername, req.body.userID]);
+        await pool.query(`UPDATE users SET username = $1, email = $2 WHERE "userID" = $3`, [req.body.newUsername, req.body.newEmail, req.body.userID]);
         res.json(req.body);
         res.status(200).send()
     }
@@ -151,13 +150,13 @@ app.put('/changeUsername', async (req, res) => {
         res.status(500).send()
     }
 })
-app.put('/changeEmail', async (req, res) => {
+app.get('/getProfile/:userID', async (req, res) => {
     try {
-        await pool.query(`UPDATE users SET "email" = $1 WHERE "userID" = $2`, [req.body.newEmail, req.body.userID]);
-        res.json(req.body);
-        res.status(200).send()
+        let profile = await pool.query(`SELECT username, email FROM users WHERE "userID" = $1`, [req.params.userID]);
+        res.json(profile);
     }
     catch {
+        console.log('Error')
         res.status(500).send()
     }
 })
@@ -166,7 +165,7 @@ app.put('/changePassword', async (req, res) => {
     try {
         let salt = await bcrypt.genSalt();
         let hashedPassword = await bcrypt.hash(req.body.newPassword, salt)
-        await pool.query(`UPDATE users SET "password" = $1 WHERE "userID" = $2`, [hashedPassword, req.body.userID]);
+        await pool.query(`UPDATE users SET password = $1 WHERE "userID" = $2`, [hashedPassword, req.body.userID]);
         res.json(JSON.stringify({
             user: req.body.userID
         }));
@@ -178,9 +177,7 @@ app.put('/changePassword', async (req, res) => {
 })
 app.post('/validatePassword', async (req, res) => {
     const currentPassword = await pool.query('SELECT * FROM users WHERE "userID"=$1', [req.body.userID]);
-    console.log(currentPassword.rows[0].password)
     try {
-        console.log(req.body.password)
         if(await bcrypt.compare(req.body.password, currentPassword.rows[0].password)){
             res.json(JSON.stringify({
                 user: req.body.username
@@ -196,5 +193,35 @@ app.post('/validatePassword', async (req, res) => {
     }
 
 })
+
+
+//upload map file
+app.post('/addMap', async (req, res) => {
+    let image = req.body.image.substring(22)
+    const imageByteArray = Buffer.from(image, 'base64');
+    try {
+        await pool.query(`UPDATE robots SET "mapData" = $1 WHERE "userID" = $2 AND "robotID" = $3 RETURNING *`, [imageByteArray, req.body.userID, req.body.robotID]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+    res.json(JSON.stringify({
+        filePath: req.body.fileName
+    }));
+    res.status(201).send();
+})
+app.get('/getMap/:userID/:robotID', async (req, res) => {
+    try {
+        let map = await pool.query(`SELECT * FROM robots WHERE "userID" = $1 AND "robotID" = $2`, [req.params.userID, req.params.robotID]);
+        let base64 = Buffer.from(map.rows[0].mapData).toString('base64');
+        res.json(base64);
+    }
+    catch {
+        console.log('Error')
+        res.status(500).send()
+    }
+});
+
+
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`))

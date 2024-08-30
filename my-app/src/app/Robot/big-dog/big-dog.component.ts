@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { SettingsService } from '../../service/settings.service';
 import { interval } from 'rxjs';
+import { Buffer } from 'buffer';
 
 
 @Component({
@@ -32,7 +33,28 @@ export class BigDogComponent {
     robotID: string = "";
     userID: string | null = "";
     interval: any;
-    constructor(private bigDogService: BigDogService, private router: Router, private route: ActivatedRoute, private SettingService: SettingsService) { }
+    imgData: string = "";
+    xCoord: number = 0;
+    yCoord: number = 0;
+    degrees: number = 0;
+
+    constructor(private bigDogService: BigDogService, private router: Router, private route: ActivatedRoute, private SettingService: SettingsService) {
+      this.SettingService.getRobotChange().subscribe(() => {
+        let robot = this.SettingService.getRobotinList(Number(this.robotID))
+        this.bigDogIP = robot.bigDogIP;
+        if(this.bigDogIP == null || this.bigDogIP == "") {
+          alert('Please set the Big Dog IP in the settings');
+          this.router.navigateByUrl('/settings');
+          return;
+        }
+        else {
+          this.updateBigDogData()
+          this.interval = setInterval(() => {
+            this.updateBigDogData();
+          }, 5000);
+        }
+      })
+    }
     
     ngOnInit() {
       this.userID = sessionStorage.getItem('key');
@@ -46,32 +68,23 @@ export class BigDogComponent {
           this.robotID = params.get('id')!;
           this.bigDogIP = "";
           clearInterval(this.interval);
-          this.SettingService.getRobots(this.userID!).subscribe((data) => {
-            if(data){
-              //get list of robots from db and create components with each robot's info
-              let jsonData = JSON.parse(JSON.stringify(data));
-              for(let robot of jsonData.rows) {
-                if (robot.robotID == this.robotID) {
-                  this.bigDogIP = robot.bigDogIP;
-                  if(this.bigDogIP == null || this.bigDogIP == "") {
-                    alert('Please set the Big Dog IP in the settings');
-                    this.router.navigateByUrl('/settings');
-                    return;
-                  }
-                  else {
-                    this.updateBigDogData()
-                    this.interval = setInterval(() => {
-                      this.updateBigDogData();
-                    }, 5000);
-                  }
-                }
-              }
-            }
-            else{
-              alert('Failed to get robots');
-            }
+          let robot = this.SettingService.getRobotinList(Number(this.robotID))
+          this.bigDogIP = robot.bigDogIP;
+          if(this.bigDogIP == null || this.bigDogIP == "") {
+            alert('Please set the Big Dog IP in the settings');
+            this.router.navigateByUrl('/settings');
+            return;
+          }
+          else {
+            this.updateBigDogData()
+            this.interval = setInterval(() => {
+              this.updateBigDogData();
+            }, 5000);
+          }
+        });
+          this.bigDogService.getBigDogData('http://localhost:3000/getMap/'+this.userID+'/'+this.robotID).subscribe((data:any) => {
+            this.imgData = 'data:image/png;base64,' + data;
           });
-        })
       } 
     }    
 
@@ -80,13 +93,16 @@ export class BigDogComponent {
         let jsonData = JSON.parse(JSON.stringify(data));
         this.battery = jsonData.rows[0].battery;
         this.chargeFlag = jsonData.rows[0].chargeFlag==0 ? "Charging" : "Not Charging";
-        this.EmergencyBtnStatus = jsonData.rows[0].emergencyFlag==0 ? "PRESSED" : "Not Pressed";
+        this.EmergencyBtnStatus = jsonData.rows[0].emergencyButton == 0 ? "PRESSED" : "Not Pressed";
       });
 
     }
 
     getCoordinates(event: {x: number, y: number}) {
       this.coordinates = event;
-      console.log('Coordinates:', this.coordinates);
+    }
+
+    ngOnDestroy() {
+      clearInterval(this.interval);
     }
 }

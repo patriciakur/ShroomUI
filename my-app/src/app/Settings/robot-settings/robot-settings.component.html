@@ -1,0 +1,6 @@
+<div id="robotSettingGrid" class="list" style="display: flex; flex-wrap: wrap;justify-content: center; align-items: center;"  #robotSettingGrid>
+    <div *ngFor="let robots of robotList">
+        <app-robot-info (delete)="deleteRobot($event)" [RobotID]="robots.robotID" [RobotName]="robots.robotName" [BigDogIP]="robots.bigDogIP" [ArmIP]="robots.armIP" [saved]="robots.saved" [newRobot]="robots.newRobot" [imageFile]="robots.bigDogMap"></app-robot-info>
+    </div>
+</div>
+<button mat-raised-button color="primary" style="z-index:2; float:right; margin: 50px; " (click) = "addRobot()">+</button>
