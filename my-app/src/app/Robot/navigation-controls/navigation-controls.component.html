@@ -12,6 +12,10 @@
           <mat-label>Y Coordinate</mat-label>
           <input matInput id="y" placeholder="Y Coordinate" [value]="yCoord">
         </mat-form-field>
+        <mat-form-field class="the-dense-zone"style="margin: 8px 8px 8px 0;" appearance="outline">
+          <mat-label>Degrees</mat-label>
+          <input matInput id="y" placeholder="Degrees" [value]="degrees">
+        </mat-form-field>
         <button mat-raised-button style="margin: 0px 8px 8px 0;" (click)="navigateToCoordinates()"> Navigate to Coordinate</button>
         <br>
         <div style="text-align:center">
@@ -22,5 +26,10 @@
       </form>
       
     </mat-card-content>
+    <mat-card-footer>
+      <div style="text-align:center">
+        <p>On the map below, click to select a coordinate or click and drag to select a coordinate and determine an angle for the robot to face.</p>
+      </div>
+    </mat-card-footer>
   
   </mat-card>

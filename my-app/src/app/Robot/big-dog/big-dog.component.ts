@@ -28,7 +28,7 @@ export class BigDogComponent {
     battery: number = 0;
     chargeFlag: string = "";
     EmergencyBtnStatus: string = "";
-    coordinates: {x: number, y: number} = {x: 0, y: 0};
+    coordinates: {x: number, y: number, degrees: number} = {x: 0, y: 0, degrees: 0};
     firstOnChangesPassed = false;
     robotID: string = "";
     userID: string | null = "";
@@ -71,6 +71,7 @@ export class BigDogComponent {
           let robot = this.SettingService.getRobotinList(Number(this.robotID))
           this.bigDogIP = robot.bigDogIP;
           if(this.bigDogIP == null || this.bigDogIP == "") {
+            clearInterval(this.interval);
             alert('Please set the Big Dog IP in the settings');
             this.router.navigateByUrl('/settings');
             return;
@@ -94,11 +95,14 @@ export class BigDogComponent {
         this.battery = jsonData.rows[0].battery;
         this.chargeFlag = jsonData.rows[0].chargeFlag==0 ? "Charging" : "Not Charging";
         this.EmergencyBtnStatus = jsonData.rows[0].emergencyButton == 0 ? "PRESSED" : "Not Pressed";
+        this.xCoord = jsonData.rows[0].xCoord;
+        this.yCoord = jsonData.rows[0].yCoord;
+        this.degrees = jsonData.rows[0].theta * 180 / Math.PI;
       });
 
     }
 
-    getCoordinates(event: {x: number, y: number}) {
+    getCoordinates(event: {x: number, y: number, degrees: number}){
       this.coordinates = event;
     }
 

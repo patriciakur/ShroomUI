@@ -6,7 +6,7 @@
         </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="3" [rowspan]="1">
-        <app-navigation-controls [Coordinates]="coordinates"></app-navigation-controls>
+        <app-navigation-controls [ip]="bigDogIP"[Coordinates]="coordinates" [xCoord]="xCoord" [yCoord]="yCoord" [degrees]="degrees"></app-navigation-controls>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1">
         <app-current-battery [battery] = "battery" [chargeFlag] = "chargeFlag"></app-current-battery>
@@ -21,7 +21,7 @@
         </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="3" [rowspan]="2">
-        <app-map [imgData]="imgData" (onSelect)="getCoordinates($event)"></app-map>
+        <app-map [imgData]="imgData" (onSelect)="getCoordinates($event)" [xCoord]="xCoord" [yCoord]="yCoord" [degrees]="degrees"></app-map>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="1" [rowspan]="1">
         <mat-card>

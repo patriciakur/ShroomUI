@@ -3,9 +3,7 @@
         <mat-card-title>Map</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <ng-container *ngIf="imgData">
-            <img class="img-responsive" src="{{imgData}}" id="dogMap" (click)="getPixelCoordinates($event)" ismap draggable="false">
-        </ng-container>
+        <canvas #canvas id="my-canvas" (mousedown)="getPixelCoordinates($event)" (mouseup)="getAngle($event)"ismap draggable="false" onselectstart="return false;"></canvas>
         <ng-container *ngIf="!imgData">
             <p>Please add the Map for the Big Dog Robot through Settings.</p>
         </ng-container>

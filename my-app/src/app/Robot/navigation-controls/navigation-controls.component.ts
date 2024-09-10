@@ -18,14 +18,15 @@ import { ActivatedRoute } from '@angular/router';
   imports: [MatCardModule, MatButtonModule, MatFormFieldModule, FormsModule, MatInputModule],
 })
 export class NavigationControlsComponent {
-  ip: string = "";
+  @Input() ip: string = "";
   requestPath: string = "";
   data: any = {};
   needsStatusCheck: boolean = false;
   body: any = {};
-  @Input() Coordinates: {x: number, y: number} = {x: 0, y: 0};
-  xCoord: number = 0;
-  yCoord: number = 0;
+  @Input() Coordinates: {x: number, y: number, degrees: number} = {x: 0, y: 0, degrees: 0};
+  @Input() xCoord: number = 0;
+  @Input() yCoord: number = 0;
+  @Input() degrees: number = 0;
   theta: number = 0;
   userID: string | null = "";
   robotID: string = "";
@@ -47,6 +48,7 @@ export class NavigationControlsComponent {
         this.ip = "";
         let robot = this.SettingService.getRobotinList(Number(this.robotID))
         this.ip= robot.bigDogIP;
+        console.log("IP is " + this.ip);
         if(this.ip == null || this.ip == "") {
           //alert('Please set the Big Dog IP in the settings');
           this.router.navigateByUrl('/settings');
@@ -65,12 +67,10 @@ export class NavigationControlsComponent {
   navigateToCharge() {
     this.requestPath = "/cmd/charge";
     this.data = { "type": 0, "point" : "charging_pile"};
-    this.needsStatusCheck = true;
     this.submitToDB(this.requestPath, this.data);
   }
   navigateToCoordinates() {
-    this.theta = Math.atan2(this.yCoord, this.xCoord); 
-
+    this.theta = this.degrees * Math.PI / 180;
     this.requestPath = "/cmd/nav";
     this.data = { "x": this.xCoord, "y": this.yCoord, "theta": this.theta};
 
@@ -81,6 +81,7 @@ export class NavigationControlsComponent {
     if (changes['Coordinates']) {
       this.xCoord = changes['Coordinates'].currentValue.x;
       this.yCoord = changes['Coordinates'].currentValue.y;
+      this.degrees = changes['Coordinates'].currentValue.degrees;
     }
   }
 
