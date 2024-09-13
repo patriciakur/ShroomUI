@@ -1,11 +1,9 @@
 import { Component, Output, Input, SimpleChanges, viewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { map } from 'rxjs';
 import { EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SettingsService } from '../../service/settings.service';
 import { CommonModule } from '@angular/common';
-import { ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-map',
@@ -106,6 +104,5 @@ ngOnInit() {
 
       }
     }
-    
   }
 }
