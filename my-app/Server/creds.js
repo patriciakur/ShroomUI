@@ -1,11 +1,11 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-    "host": "shallowly-forbearing-bandicoot.data-1.use1.tembo.io", 
-    "user": "postgres",  
-    "database": "Mushroom",
-    "password": "YRkedybSqhM0fHje", 
-    "port": 5432,
+    "host": "", 
+    "user": "",  
+    "database": "",
+    "password": "", 
+    "port": 0,
     ssl: {
         rejectUnauthorized: false
     },
