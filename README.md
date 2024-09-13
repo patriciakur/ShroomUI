@@ -12,6 +12,7 @@ If running on a Raspberry Pi with a GUI, please open and run with the integrated
 If running the web application, cd into the my-app
 
 
+## Install / Startup
 
 Node Version requirement
 ```
@@ -23,6 +24,8 @@ version >= 20.12
 npm install
 ```
 Installs all required modules/dependencies.
+
+2. Update the creds.js in `./my-app/Server` to connect to a database.
 
 ### Scripts
 ```
